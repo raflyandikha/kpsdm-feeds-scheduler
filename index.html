@@ -11,9 +11,11 @@
 
   <style>
     :root{
+      --bg:#05050A;
+      --card:rgba(255,255,255,.06);
+      --stroke:rgba(255,255,255,.14);
       --text:#EAF0FF;
       --muted:rgba(234,240,255,.72);
-      --stroke:rgba(255,255,255,.14);
       --shadow:0 25px 80px rgba(0,0,0,.55);
       --r:24px;
 
@@ -51,12 +53,6 @@
       font-size:38px;
       font-weight:900;
       letter-spacing:2px;
-      animation:titleGlow 2.5s infinite alternate;
-    }
-
-    @keyframes titleGlow{
-      from{text-shadow:0 0 8px rgba(255,255,255,.15)}
-      to{text-shadow:0 0 18px rgba(255,204,0,.55)}
     }
 
     .sub{
@@ -65,66 +61,12 @@
       line-height:1.5;
     }
 
-    .logo{
-      width:70px;
-      height:70px;
-      margin:auto;
-      border-radius:22px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.2);
-      box-shadow:0 0 25px rgba(255,204,0,.25);
-      animation:logoFloat 3s ease-in-out infinite;
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:18px;
     }
 
-    @keyframes logoFloat{
-      0%,100%{transform:translateY(0)}
-      50%{transform:translateY(-10px)}
-    }
-
-    .logo img{width:100%;height:100%;object-fit:cover}
-
-    /* SWITCH TABS */
-    .tabs{
-      display:flex;
-      justify-content:center;
-      gap:12px;
-      margin:25px 0;
-      flex-wrap:wrap;
-    }
-
-    .tabBtn{
-      padding:12px 18px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(0,0,0,.25);
-      color:white;
-      cursor:pointer;
-      font-weight:800;
-      transition:.25s;
-    }
-
-    .tabBtn.active{
-      background:var(--purple);
-      transform:scale(1.05);
-      box-shadow:0 0 18px rgba(106,54,122,.55);
-    }
-
-    /* COMPONENT SECTION */
-    .component{
-      display:none;
-      animation:fadeIn .4s ease;
-    }
-
-    .component.active{
-      display:block;
-    }
-
-    @keyframes fadeIn{
-      from{opacity:0;transform:translateY(10px)}
-      to{opacity:1;transform:translateY(0)}
-    }
-
-    /* CARD */
     .card{
       background:rgba(255,255,255,.05);
       border:1px solid var(--stroke);
@@ -132,7 +74,6 @@
       box-shadow:var(--shadow);
       backdrop-filter:blur(14px);
       overflow:hidden;
-      margin-bottom:20px;
     }
 
     h2{
@@ -171,26 +112,93 @@
     .primary{
       background:var(--purple);
       color:white;
-      margin-top:10px;
+      margin-top:20px;
     }
 
-    /* CALENDAR FIX */
-    #calendar{
-      background:rgba(255,255,255,.06);
-      border-radius:18px;
-      padding:15px;
-      min-height:650px;
+    /* SWITCHING TAB */
+    .tabs{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      margin-bottom:20px;
     }
 
-    /* GOOGLE CALENDAR STYLE */
-    .fc{
-      font-size:13px;
-    }
-
-    .fc-daygrid-event{
-      border-radius:10px !important;
-      padding:4px 6px;
+    .tabBtn{
+      padding:12px 18px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.2);
+      background:rgba(0,0,0,.25);
+      color:white;
+      cursor:pointer;
       font-weight:700;
+    }
+
+    .tabBtn.active{
+      background:var(--g1);
+      color:black;
+    }
+
+    .tabContent{
+      display:none;
+    }
+
+    .tabContent.active{
+      display:block;
+    }
+
+    /* TABLE SCROLL ONLY */
+    .scrollX{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      padding:0 16px 16px;
+    }
+
+    table{
+      min-width:850px;
+      width:100%;
+      border-spacing:0 12px;
+    }
+
+    th{
+      text-align:left;
+      font-size:11px;
+      color:rgba(255,255,255,.5);
+      padding:0 10px;
+    }
+
+    td{
+      padding:14px 10px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    tr td:first-child{border-radius:18px 0 0 18px}
+    tr td:last-child{border-radius:0 18px 18px 0}
+
+    .badge{
+      padding:8px 14px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:12px;
+      color:black;
+      display:inline-block;
+    }
+
+    .mini{
+      padding:8px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.2);
+      background:rgba(0,0,0,.25);
+      color:white;
+      cursor:pointer;
+    }
+
+    /* FULLCALENDAR STYLE LIKE GOOGLE */
+    #calendar{
+      padding:18px;
+      background:white;
+      border-radius:20px;
+      color:black;
     }
 
     footer{
@@ -203,30 +211,28 @@
 </head>
 
 <body>
+
 <div class="wrap">
 
 <header>
-  <div class="logo">
-    <img src="https://i.imgur.com/7cvCZVb.png">
-  </div>
   <h1>SOCIAL MEDIA SCHEDULER</h1>
   <div class="sub">
-    Bidang Keorganisasian dan Pengembangan Sumber Daya Manusia<br>
-    BEM FKM Undip 2026, Kabinet Arunika
+    Bidang K&PSDM — BEM FKM Undip 2026
   </div>
 </header>
 
-<!-- SWITCH TABS -->
+<!-- TAB BUTTONS -->
 <div class="tabs">
-  <button class="tabBtn active" onclick="switchTab('feeds')">Feeds Scheduler</button>
-  <button class="tabBtn" onclick="switchTab('stories')">Stories Scheduler</button>
-  <button class="tabBtn" onclick="switchTab('calendarTab')">Kalender Jadwal</button>
+  <button class="tabBtn active" onclick="switchTab('feedsTab')">📌 Feeds</button>
+  <button class="tabBtn" onclick="switchTab('storiesTab')">⚡ Stories</button>
+  <button class="tabBtn" onclick="switchTab('calendarTab')">📅 Kalender</button>
 </div>
 
-<!-- COMPONENT FEEDS -->
-<div id="feeds" class="component active">
+<!-- TAB FEEDS -->
+<div id="feedsTab" class="tabContent active">
+
   <section class="card">
-    <h2>Form Schedule/Reschedule Feeds</h2>
+    <h2>Form Schedule Feeds</h2>
     <form id="feedForm">
       <label>Nama Pengisi</label>
       <input id="feedNama" required>
@@ -240,12 +246,33 @@
       <button class="primary">Simpan Jadwal Feeds</button>
     </form>
   </section>
+
+  <section class="card" style="margin-top:20px;">
+    <h2>Jadwal Post Feeds</h2>
+    <div class="scrollX">
+      <table>
+        <thead>
+          <tr>
+            <th>Urutan</th>
+            <th>Warna</th>
+            <th>Nama</th>
+            <th>Konten</th>
+            <th>Waktu Posting</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="feedTable"></tbody>
+      </table>
+    </div>
+  </section>
+
 </div>
 
-<!-- COMPONENT STORIES -->
-<div id="stories" class="component">
+<!-- TAB STORIES -->
+<div id="storiesTab" class="tabContent">
+
   <section class="card">
-    <h2>Form Schedule/Reschedule Stories</h2>
+    <h2>Form Schedule Stories</h2>
     <form id="storyForm">
       <label>Nama Pengisi</label>
       <input id="storyNama" required>
@@ -259,10 +286,30 @@
       <button class="primary">Simpan Jadwal Story</button>
     </form>
   </section>
+
+  <section class="card" style="margin-top:20px;">
+    <h2>Jadwal Post Stories</h2>
+    <div class="scrollX">
+      <table>
+        <thead>
+          <tr>
+            <th>Urutan</th>
+            <th>Warna</th>
+            <th>Nama</th>
+            <th>Konten</th>
+            <th>Waktu Posting</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="storyTable"></tbody>
+      </table>
+    </div>
+  </section>
+
 </div>
 
-<!-- COMPONENT CALENDAR -->
-<div id="calendarTab" class="component">
+<!-- TAB CALENDAR -->
+<div id="calendarTab" class="tabContent">
   <section class="card">
     <h2>Kalender Jadwal Feeds + Stories</h2>
     <div id="calendar"></div>
@@ -270,18 +317,20 @@
 </div>
 
 <footer>
-  © Bidang Keorganisasian dan Pengembangan Sumber Daya Manusia — BEM FKM Undip 2026
+  © Bidang K&PSDM — BEM FKM Undip 2026
 </footer>
 
 </div>
 
-<!-- FIREBASE -->
+<!-- FIREBASE + FIRESTORE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
   import {
     getFirestore,
     collection,
     addDoc,
+    deleteDoc,
+    doc,
     onSnapshot
   } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
@@ -297,35 +346,80 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  const SOP = [
+    {name:"Kuning–Ungu", css:"var(--g1)"},
+    {name:"Ungu–Biru", css:"var(--g2)"},
+    {name:"Kuning–Biru", css:"var(--g3)"}
+  ];
+
   let feeds=[], stories=[];
   let calendar;
+
+  function fmt(iso){
+    return new Date(iso).toLocaleString("id-ID",{
+      day:"2-digit",month:"short",year:"numeric",
+      hour:"2-digit",minute:"2-digit"
+    });
+  }
+
+  function renderTable(data, tbodyId){
+    const tbody=document.getElementById(tbodyId);
+    tbody.innerHTML="";
+    data.sort((a,b)=>new Date(a.waktu)-new Date(b.waktu));
+
+    data.forEach((p,i)=>{
+      const color=SOP[i%3];
+      tbody.innerHTML+=`
+        <tr>
+          <td><b>#${i+1}</b></td>
+          <td><span class="badge" style="background:${color.css}">${color.name}</span></td>
+          <td>${p.nama}</td>
+          <td>${p.judul}</td>
+          <td>${fmt(p.waktu)}</td>
+          <td>
+            <button class="mini" onclick="hapus('${p.id}','${tbodyId}')">Hapus</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  window.hapus = async(id,type)=>{
+    const col = type==="feedTable" ? "feeds" : "stories";
+    await deleteDoc(doc(db,col,id));
+  };
 
   function renderCalendar(){
     const events=[];
 
-    feeds.forEach(f=>{
-      events.push({
-        title:"📌 Feeds: "+f.judul,
-        start:f.waktu
-      });
-    });
+    feeds.forEach(f=>events.push({
+      title:"📌 Feeds: "+f.judul,
+      start:f.waktu
+    }));
 
-    stories.forEach(s=>{
-      events.push({
-        title:"⚡ Story: "+s.judul,
-        start:s.waktu
-      });
-    });
+    stories.forEach(s=>events.push({
+      title:"⚡ Story: "+s.judul,
+      start:s.waktu
+    }));
 
     if(calendar) calendar.destroy();
 
-    calendar = new FullCalendar.Calendar(
+    calendar=new FullCalendar.Calendar(
       document.getElementById("calendar"),
       {
         initialView:"dayGridMonth",
-        height:650,
+        headerToolbar:{
+          left:"prev,next today",
+          center:"title",
+          right:"dayGridMonth,timeGridWeek,timeGridDay"
+        },
+        validRange:{
+          start:"2025-01-01",
+          end:"2026-12-31"
+        },
         events,
-        eventDisplay:"block"
+        eventDisplay:"block",
+        height:"auto"
       }
     );
 
@@ -334,13 +428,15 @@
 
   // REALTIME FEEDS
   onSnapshot(collection(db,"feeds"),snap=>{
-    feeds=snap.docs.map(d=>d.data());
+    feeds=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderTable(feeds,"feedTable");
     renderCalendar();
   });
 
   // REALTIME STORIES
   onSnapshot(collection(db,"stories"),snap=>{
-    stories=snap.docs.map(d=>d.data());
+    stories=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderTable(stories,"storyTable");
     renderCalendar();
   });
 
@@ -353,7 +449,6 @@
       waktu:feedWaktu.value
     });
     e.target.reset();
-    alert("Jadwal Feeds tersimpan!");
   });
 
   // SUBMIT STORY
@@ -365,26 +460,22 @@
       waktu:storyWaktu.value
     });
     e.target.reset();
-    alert("Jadwal Story tersimpan!");
   });
 
-</script>
+  // SWITCH TAB FUNCTION
+  window.switchTab = (tabId)=>{
+    document.querySelectorAll(".tabContent").forEach(t=>t.classList.remove("active"));
+    document.querySelectorAll(".tabBtn").forEach(b=>b.classList.remove("active"));
 
-<!-- SWITCH SCRIPT -->
-<script>
-  function switchTab(id){
-    document.querySelectorAll(".component").forEach(c=>{
-      c.classList.remove("active");
-    });
-    document.querySelectorAll(".tabBtn").forEach(b=>{
-      b.classList.remove("active");
-    });
+    document.getElementById(tabId).classList.add("active");
 
-    document.getElementById(id).classList.add("active");
+    event.target.classList.add("active");
 
-    const btns=[...document.querySelectorAll(".tabBtn")];
-    btns.find(b=>b.getAttribute("onclick").includes(id)).classList.add("active");
-  }
+    if(tabId==="calendarTab"){
+      setTimeout(()=>renderCalendar(),300);
+    }
+  };
+
 </script>
 
 </body>
