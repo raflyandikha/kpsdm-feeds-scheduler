@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IG FEED SCHEDULER</title>
+
+  <style>
+    :root{
+      --bg:#05050A;
+      --card:rgba(255,255,255,.06);
+      --stroke:rgba(255,255,255,.14);
+      --text:#EAF0FF;
+      --muted:rgba(234,240,255,.72);
+      --shadow: 0 25px 80px rgba(0,0,0,.55);
+      --r:24px;
+
+      /* Brand Colors */
+      --purple:#6A367A;
+      --yellow:#FFCC00;
+      --blue:#00167A;
+
+      /* SOP Gradients */
+      --g1: linear-gradient(135deg,var(--yellow),var(--purple));
+      --g2: linear-gradient(135deg,var(--blue),var(--purple));
+      --g3: linear-gradient(135deg,var(--yellow),var(--blue));
+    }
+
+    *{box-sizing:border-box}
+
+    /* ===== Moving Gradient Background ===== */
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      min-height:100vh;
+      background:linear-gradient(-45deg,#0a0a12,#1a0630,#2b0f4a,#05050a);
+      background-size:400% 400%;
+      animation:bgMove 14s ease infinite;
+    }
+
+    @keyframes bgMove{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+
+    .wrap{max-width:1150px;margin:0 auto;padding:26px 18px 70px}
+
+    /* ===== Smooth Entrance Animations ===== */
+    @keyframes floatIn{
+      from{opacity:0; transform:translateY(18px) scale(.98)}
+      to{opacity:1; transform:translateY(0) scale(1)}
+    }
+
+    header{
+      text-align:center;
+      margin-bottom:22px;
+      animation:floatIn .9s ease;
+    }
+
+    .brandRow{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:12px;
+    }
+
+    /* Simple logo placeholder */
+    .logo{
+      width:46px;height:46px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 0 25px rgba(106,54,122,.45);
+      overflow:hidden;
+      animation:logoPulse 2.6s ease-in-out infinite;
+    }
+
+    .logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    @keyframes logoPulse{
+      0%,100%{transform:scale(1); filter:drop-shadow(0 0 0 rgba(255,255,255,0))}
+      50%{transform:scale(1.08); filter:drop-shadow(0 0 14px rgba(255,255,255,.25))}
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(22px,3vw,40px);
+      letter-spacing:2px;
+      font-weight:900;
+    }
+
+    .sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.35;
+    }
+
+    .grid{display:grid;grid-template-columns:390px 1fr;gap:18px}
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--stroke);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      animation:floatIn 1.05s ease;
+      backdrop-filter: blur(14px);
+    }
+
+    .card h2{
+      margin:0;
+      padding:18px 18px 10px;
+      font-size:15px;
+      letter-spacing:.6px;
+      text-transform:uppercase;
+      color:rgba(234,240,255,.92);
+    }
+
+    form{padding:0 18px 18px;display:flex;flex-direction:column;gap:10px}
+    label{font-size:12px;color:var(--muted)}
+
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.15);
+      background:rgba(0,0,0,.25);
+      color:var(--text);
+      outline:none;
+      transition:.25s;
+    }
+    input:focus{
+      border-color:rgba(106,54,122,.9);
+      box-shadow:0 0 0 3px rgba(106,54,122,.25);
+    }
+
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+
+    button{
+      border:0;
+      padding:11px 15px;
+      border-radius:16px;
+      cursor:pointer;
+      font-weight:800;
+      letter-spacing:.3px;
+      transition:.25s;
+    }
+
+    .primary{
+      background:var(--purple);
+      color:white;
+    }
+    .primary:hover{transform:translateY(-3px);box-shadow:0 12px 25px rgba(106,54,122,.35)}
+
+    .ghost{
+      background:transparent;
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.18);
+      font-weight:600;
+    }
+
+    /* ===== Table Scroll on Mobile ===== */
+    .tableWrap{padding:16px 16px 18px}
+
+    .scrollX{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      padding-bottom:6px;
+    }
+
+    table{
+      min-width:760px;
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 10px;
+    }
+
+    th{
+      text-align:left;
+      font-size:11px;
+      color:rgba(234,240,255,.55);
+      font-weight:700;
+      padding:0 10px;
+    }
+
+    td{
+      padding:12px 10px;
+      background:rgba(255,255,255,.04);
+      border-top:1px solid rgba(255,255,255,.10);
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+
+    tr td:first-child{border-left:1px solid rgba(255,255,255,.10);border-radius:16px 0 0 16px}
+    tr td:last-child{border-right:1px solid rgba(255,255,255,.10);border-radius:0 16px 16px 0}
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:#05050A;
+      font-weight:900;
+    }
+    .dot{width:10px;height:10px;border-radius:999px;background:#fff;opacity:.95}
+
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+
+    .mini{
+      padding:8px 10px;
+      border-radius:14px;
+      font-size:12px;
+      font-weight:800;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.20);
+      color:var(--text);
+      cursor:pointer;
+      transition:.2s;
+    }
+    .mini:hover{transform:scale(1.05)}
+
+    /* Drag highlight */
+    .dragging{opacity:.5}
+
+    .empty{
+      padding:22px;
+      text-align:center;
+      color:var(--muted);
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius:18px;
+      margin-top:10px;
+    }
+
+    footer{
+      text-align:center;
+      margin-top:26px;
+      color:rgba(234,240,255,.55);
+      font-size:12px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- HEADER CENTER + LOGO -->
+    <header>
+      <div class="brandRow">
+        <div class="logo">
+          <img src="https://i.imgur.com/7cvCZVb.png" alt="Logo" />
+        </div>
+        <h1>INSTAGRAM FEEDS SCHEDULER</h1>
+      </div>
+      <div class="sub">Bidang Keorganisasian dan Pengembangan Sumber Daya Manusia</div>
+      <div class="sub">BEM FKM Undip 2026, Kabinet Arunika</div>
+    </header>
+
+    <div class="grid">
+
+      <!-- FORM -->
+      <section class="card">
+        <h2>Schedule or Reschedule Form</h2>
+        <form id="postForm">
+
+          <div>
+            <label>Nama Pengisi</label>
+            <input id="nama" required />
+          </div>
+
+          <div>
+            <label>Judul Konten</label>
+            <input id="judul" required />
+          </div>
+
+          <div>
+            <label>Tanggal & Jam Posting</label>
+            <input id="waktu" type="datetime-local" required />
+          </div>
+
+          <div class="btns">
+            <button class="primary" type="submit">Simpan Jadwal</button>
+            <button class="ghost" type="button" id="resetBtn">Reset Form</button>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- TABLE + DRAG DROP -->
+      <section class="card">
+        <div class="tableWrap">
+
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+            <h2 style="padding:0;margin:0">Jadwal Posting</h2>
+            <button class="mini" id="clearAll">Hapus Semua</button>
+          </div>
+
+          <div class="scrollX">
+            <table>
+              <thead>
+                <tr>
+                  <th>Urutan</th>
+                  <th>Warna SOP</th>
+                  <th>Nama</th>
+                  <th>Judul</th>
+                  <th>Waktu Posting</th>
+                  <th>Reschedule/Hapus</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+
+          <div id="empty" class="empty" style="display:none">
+            Belum ada jadwal. Tambahkan posting pertama ✨
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <footer>
+      © Bidang Keorganisasian dan Pengembangan Sumber Daya Manusia — BEM FKM Undip 2026
+    </footer>
+
+  </div>
+
+<script>
+  // ====== SOP Gradient Rotation ======
+  const SOP = [
+    { name: "Kuning–Ungu", css: getComputedStyle(document.documentElement).getPropertyValue('--g1').trim() },
+    { name: "Biru–Ungu",   css: getComputedStyle(document.documentElement).getPropertyValue('--g2').trim() },
+    { name: "Kuning–Biru", css: getComputedStyle(document.documentElement).getPropertyValue('--g3').trim() },
+  ];
+
+  // ====== Storage ======
+  // ====== Firebase Firestore Online Sync ======
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyAfZq2FNtrNId5j32ogtSc4AGsgiIUVwtM",
+  authDomain: "ig-feed-scheduler.firebaseapp.com",
+  projectId: "ig-feed-scheduler",
+  storageBucket: "ig-feed-scheduler.firebasestorage.app",
+  messagingSenderId: "374047074631",
+  appId: "1:374047074631:web:cc2c605fcfb8fcf9cac462"
+};
+
+// Init Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let const snap = await getDocs(collection(db, "posts"));
+      for(const d of snap.docs){
+        await deleteDoc(doc(db, "posts", d.id));
+      }
+      posts = [];
+      resetForm();
+      render();
+      });
+    });
+  }
+
+  // ====== CRUD ======
+  function uid(){
+    return Math.random().toString(16).slice(2) + Date.now().toString(16);
+  }
+
+  document.getElementById('postForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+
+    const nama = document.getElementById('nama').value.trim();
+    const judul = document.getElementById('judul').value.trim();
+    const waktu = document.getElementById('waktu').value;
+
+    if(!nama || !judul || !waktu) return;
+
+    if(editingId){
+      await updateDoc(doc(db, "posts", editingId), { nama, judul, waktu });
+    } else {
+      await addDoc(collection(db, "posts"), { nama, judul, waktu });
+    }
+
+    resetForm();
+    render();
+  });
+
+  function editPost(id){
+    const p = posts.find(x => x.id === id);
+    if(!p) return;
+
+    editingId = id;
+    document.getElementById('nama').value = p.nama;
+    document.getElementById('judul').value = p.judul;
+    document.getElementById('waktu').value = p.waktu;
+
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function deletePost(id){
+    await deleteDoc(doc(db, "posts", id));
+    if(editingId === id) resetForm();
+    loadPosts();
+  }
+
+  function resetForm(){
+    editingId = null;
+    document.getElementById('postForm').reset();
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+
+  document.getElementById('clearAll').addEventListener('click', ()=>{
+    if(posts.length === 0){
+      alert('Belum ada jadwal untuk dihapus.');
+      return;
+    }
+
+    if(confirm('Yakin hapus semua jadwal?')){
+      posts = [];
+      localStorage.removeItem(KEY);
+      resetForm();
+      render();
+    }
+  });
+
+  window.editPost = editPost;
+  window.deletePost = deletePost;
+
+  loadPosts();
+
+  async function loadPosts(){
+    posts = [];
+    const snap = await getDocs(collection(db, "posts"));
+    snap.forEach(docSnap => {
+      posts.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    render();
+  }
+</script>
+</body>
+</html>
