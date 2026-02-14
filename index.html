@@ -119,6 +119,7 @@
       justify-content:center;
       gap:12px;
       margin:20px 0;
+      flex-wrap:wrap;
     }
 
     .tabBtn{
@@ -129,6 +130,11 @@
       color:white;
       cursor:pointer;
       font-weight:700;
+      transition:.25s;
+    }
+
+    .tabBtn:hover{
+      transform:scale(1.05);
     }
 
     .tabBtn.active{
@@ -226,6 +232,7 @@
       border:1px solid rgba(255,255,255,.2);
     }
 
+    /* CALENDAR STYLE GOOGLE */
     #calendar{
       padding:18px;
       background:white;
@@ -402,7 +409,7 @@
     return new Date(iso).toLocaleString("id-ID");
   }
 
-  /* SWITCH TAB */
+  /* SWITCH TAB FIX */
   window.switchTab=(tabId,ev)=>{
     document.querySelectorAll(".tabContent").forEach(t=>t.classList.remove("active"));
     document.querySelectorAll(".tabBtn").forEach(b=>b.classList.remove("active"));
@@ -410,12 +417,43 @@
     document.getElementById(tabId).classList.add("active");
     ev.target.classList.add("active");
 
+    /* 🔥 FIX: Calendar MUST render after tab visible */
     if(tabId==="calendarTab"){
-      setTimeout(renderCalendar,300);
+      setTimeout(()=>{
+        calendar.render();
+        calendar.updateSize();
+      },400);
     }
   };
 
-  /* RENDER TABLE + EDIT BUTTON */
+  /* CALENDAR INIT ONCE */
+  function initCalendar(){
+    calendar=new FullCalendar.Calendar(document.getElementById("calendar"),{
+      initialView:"dayGridMonth",
+      headerToolbar:{
+        left:"prev,next today",
+        center:"title",
+        right:"dayGridMonth,timeGridWeek,timeGridDay"
+      },
+      validRange:{start:"2025-01-01",end:"2026-12-31"},
+      height:"auto",
+      events:[]
+    });
+
+    calendar.render();
+  }
+
+  /* UPDATE CALENDAR EVENTS */
+  function updateCalendar(){
+    const events=[];
+    feeds.forEach(f=>events.push({title:"📌 "+f.judul,start:f.waktu}));
+    stories.forEach(s=>events.push({title:"⚡ "+s.judul,start:s.waktu}));
+
+    calendar.removeAllEvents();
+    calendar.addEventSource(events);
+  }
+
+  /* FEEDS TABLE */
   function renderFeeds(){
     const tbody=document.getElementById("feedTable");
     tbody.innerHTML="";
@@ -448,6 +486,7 @@
     window.scrollTo({top:0,behavior:"smooth"});
   };
 
+  /* STORIES TABLE */
   function renderStories(){
     const tbody=document.getElementById("storyTable");
     tbody.innerHTML="";
@@ -482,40 +521,17 @@
     await deleteDoc(doc(db,col,id));
   };
 
-  /* CALENDAR */
-  function renderCalendar(){
-    const events=[];
-    feeds.forEach(f=>events.push({title:"📌 Feeds: "+f.judul,start:f.waktu}));
-    stories.forEach(s=>events.push({title:"⚡ Story: "+s.judul,start:s.waktu}));
-
-    if(calendar) calendar.destroy();
-
-    calendar=new FullCalendar.Calendar(document.getElementById("calendar"),{
-      initialView:"dayGridMonth",
-      headerToolbar:{
-        left:"prev,next today",
-        center:"title",
-        right:"dayGridMonth,timeGridWeek,timeGridDay"
-      },
-      validRange:{start:"2025-01-01",end:"2026-12-31"},
-      events,
-      height:"auto"
-    });
-
-    calendar.render();
-  }
-
   /* REALTIME */
   onSnapshot(collection(db,"feeds"),snap=>{
     feeds=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderFeeds();
-    renderCalendar();
+    updateCalendar();
   });
 
   onSnapshot(collection(db,"stories"),snap=>{
     stories=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderStories();
-    renderCalendar();
+    updateCalendar();
   });
 
   /* SUBMIT FEEDS */
@@ -557,6 +573,9 @@
     }
     e.target.reset();
   });
+
+  /* INIT CALENDAR ON LOAD */
+  initCalendar();
 
 </script>
 
