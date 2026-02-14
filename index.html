@@ -3,21 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>IG Scheduler</title>
+  <title>INSTAGRAM FEEDS SCHEDULER</title>
 
-  <!-- ===== FULLCALENDAR (Modern Calendar) ===== -->
+  <!-- FullCalendar -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
 
   <style>
     :root{
-      --bg:#05050A;
-      --card:rgba(255,255,255,.06);
-      --stroke:rgba(255,255,255,.14);
-      --text:#EAF0FF;
-      --muted:rgba(234,240,255,.72);
-      --shadow: 0 25px 80px rgba(0,0,0,.55);
-      --r:24px;
-
       --purple:#6A367A;
       --yellow:#FFCC00;
       --blue:#00167A;
@@ -25,6 +17,11 @@
       --g1: linear-gradient(135deg,var(--yellow),var(--purple));
       --g2: linear-gradient(135deg,var(--blue),var(--purple));
       --g3: linear-gradient(135deg,var(--yellow),var(--blue));
+
+      --glass: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.16);
+      --text:#EAF0FF;
+      --muted: rgba(234,240,255,.65);
     }
 
     *{box-sizing:border-box}
@@ -45,42 +42,95 @@
       100%{background-position:0% 50%}
     }
 
-    .wrap{max-width:1150px;margin:0 auto;padding:26px 18px 70px}
-
-    header{text-align:center;margin-bottom:22px;}
-
-    .brandRow{
+    /* ===== SPLASH INTRO ===== */
+    #splash{
+      position:fixed;
+      inset:0;
+      background:#05050A;
       display:flex;
       justify-content:center;
       align-items:center;
-      gap:12px;
+      z-index:9999;
+      animation:fadeOut 2.8s ease forwards;
     }
 
-    .logo{
-      width:46px;height:46px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.18);
-      box-shadow:0 0 25px rgba(106,54,122,.45);
-      overflow:hidden;
+    #splash img{
+      width:170px;
+      animation:zoomIn 2s ease;
     }
 
-    .logo img{width:100%;height:100%;object-fit:cover;}
+    @keyframes zoomIn{
+      from{opacity:0; transform:scale(.5)}
+      to{opacity:1; transform:scale(1)}
+    }
 
+    @keyframes fadeOut{
+      0%,70%{opacity:1}
+      100%{opacity:0; visibility:hidden}
+    }
+
+    .wrap{
+      max-width:1150px;
+      margin:0 auto;
+      padding:26px 18px 70px;
+    }
+
+    header{
+      text-align:center;
+      margin-bottom:22px;
+    }
+
+    /* ===== TITLE ANIMATION ===== */
     h1{
       margin:0;
-      font-size:clamp(22px,3vw,40px);
-      letter-spacing:2px;
+      font-size:clamp(24px,3vw,44px);
       font-weight:900;
+      letter-spacing:2px;
+      text-shadow:0 0 18px rgba(255,255,255,.25);
+      animation:titleGlow 2.8s ease-in-out infinite;
     }
 
-    .sub{margin-top:6px;color:var(--muted);font-size:14px;}
+    @keyframes titleGlow{
+      0%,100%{text-shadow:0 0 10px rgba(255,255,255,.2)}
+      50%{text-shadow:0 0 25px rgba(255,255,255,.45)}
+    }
 
-    /* ===== TAB SWITCHER ===== */
+    .sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    /* ===== LOGO ANIMATION ===== */
+    .logo{
+      width:65px;
+      height:65px;
+      margin:0 auto 10px;
+      border-radius:22px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.2);
+      animation:logoPulse 2.5s ease-in-out infinite;
+    }
+
+    .logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    @keyframes logoPulse{
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.12)}
+    }
+
+    /* ===== Tabs ===== */
     .tabs{
       display:flex;
       justify-content:center;
       gap:10px;
       margin:25px 0;
+      flex-wrap:wrap;
     }
 
     .tabBtn{
@@ -95,30 +145,41 @@
 
     .tabBtn.active{
       background:var(--purple);
-      box-shadow:0 0 18px rgba(106,54,122,.45);
+      box-shadow:0 0 18px rgba(106,54,122,.55);
     }
 
-    .grid{display:grid;grid-template-columns:390px 1fr;gap:18px}
-    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    /* ===== Layout ===== */
+    .grid{
+      display:grid;
+      grid-template-columns:390px 1fr;
+      gap:18px;
+    }
+
+    @media(max-width:900px){
+      .grid{grid-template-columns:1fr;}
+    }
 
     .card{
       background:rgba(255,255,255,.05);
       border:1px solid var(--stroke);
-      border-radius:var(--r);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      backdrop-filter: blur(14px);
+      border-radius:24px;
+      padding:15px;
+      backdrop-filter:blur(14px);
+      box-shadow:0 25px 70px rgba(0,0,0,.55);
     }
 
     .card h2{
-      margin:0;
-      padding:18px;
-      font-size:15px;
+      margin:0 0 12px;
+      font-size:14px;
       text-transform:uppercase;
+      letter-spacing:.6px;
+      color:rgba(234,240,255,.85);
     }
 
-    form{padding:0 18px 18px;display:flex;flex-direction:column;gap:10px}
-    label{font-size:12px;color:var(--muted)}
+    label{
+      font-size:12px;
+      color:var(--muted);
+    }
 
     input{
       width:100%;
@@ -127,9 +188,8 @@
       border:1px solid rgba(255,255,255,.15);
       background:rgba(0,0,0,.25);
       color:white;
+      margin-top:5px;
     }
-
-    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
 
     button{
       border:0;
@@ -139,282 +199,288 @@
       font-weight:800;
     }
 
-    .primary{background:var(--purple);color:white;}
-    .ghost{background:transparent;border:1px solid rgba(255,255,255,.18);color:white;}
-
-    .tableWrap{padding:16px;}
-    table{width:100%;min-width:760px;border-spacing:0 10px;}
-    th{font-size:11px;color:rgba(234,240,255,.55);text-align:left;}
-    td{
-      padding:12px;
-      background:rgba(255,255,255,.04);
-    }
-
-    .badge{
-      padding:7px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:900;
-      color:#05050A;
+    .primary{
+      background:var(--purple);
+      color:white;
     }
 
     .mini{
-      padding:8px 10px;
+      padding:8px 12px;
       border-radius:14px;
-      font-size:12px;
       border:1px solid rgba(255,255,255,.18);
       background:rgba(0,0,0,.25);
       color:white;
       cursor:pointer;
+      font-size:12px;
     }
 
-    /* Calendar Card */
-    #calendar{
-      margin-top:20px;
-      padding:15px;
-      background:rgba(255,255,255,.04);
-      border-radius:18px;
+    /* ===== MOBILE SCROLL FIX ===== */
+    .scrollX{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      padding-bottom:8px;
     }
 
-    footer{text-align:center;margin-top:26px;color:rgba(234,240,255,.55);}
+    table{
+      width:100%;
+      min-width:820px;
+      border-spacing:0 12px;
+    }
+
+    th{
+      text-align:left;
+      font-size:11px;
+      color:rgba(234,240,255,.55);
+    }
+
+    td{
+      padding:14px 12px;
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter:blur(18px);
+    }
+
+    tr td:first-child{border-radius:18px 0 0 18px;}
+    tr td:last-child{border-radius:0 18px 18px 0;}
+
+    .badge{
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:900;
+      color:#05050A;
+      display:inline-block;
+    }
+
+    footer{
+      text-align:center;
+      margin-top:26px;
+      font-size:12px;
+      color:rgba(234,240,255,.55);
+    }
   </style>
 </head>
 
 <body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <img src="https://i.imgur.com/7cvCZVb.png">
+</div>
+
 <div class="wrap">
 
 <header>
-  <div class="brandRow">
-    <div class="logo">
-      <img src="https://i.imgur.com/7cvCZVb.png">
-    </div>
-    <h1>IG SCHEDULER</h1>
+  <div class="logo">
+    <img src="https://i.imgur.com/7cvCZVb.png">
   </div>
-  <div class="sub">Feeds + Story Scheduler</div>
+
+  <h1>INSTAGRAM FEEDS SCHEDULER</h1>
+
+  <div class="sub">
+    Bidang Keorganisasian dan Pengembangan Sumber Daya Manusia<br>
+    BEM FKM Undip 2026, Kabinet Arunika
+  </div>
 </header>
 
-<!-- ===== TAB SWITCHER ===== -->
+<!-- Tabs -->
 <div class="tabs">
   <button class="tabBtn active" onclick="switchTab('feeds')">FEEDS</button>
   <button class="tabBtn" onclick="switchTab('story')">STORY</button>
   <button class="tabBtn" onclick="switchTab('calendar')">KALENDER</button>
 </div>
 
-<!-- ================================================= -->
-<!-- ================= FEEDS SECTION ================= -->
-<!-- ================================================= -->
+<!-- ================= FEEDS ================= -->
 <div id="feedsSection">
-
   <div class="grid">
+
     <section class="card">
-      <h2>Form Feeds</h2>
+      <h2>Form Schedule/Reschedule Feeds</h2>
       <form id="feedsForm">
-        <label>Nama</label>
+        <label>Nama Pengisi</label>
         <input id="feedsNama" required>
 
-        <label>Judul Konten</label>
-        <input id="feedsJudul" required>
+        <label>Konten yang ingin diupload</label>
+        <input id="feedsKonten" required>
 
-        <label>Waktu Posting</label>
+        <label>Tanggal & Jam Posting</label>
         <input id="feedsWaktu" type="datetime-local" required>
 
-        <div class="btns">
-          <button class="primary">Simpan Feeds</button>
-        </div>
+        <button class="primary">Simpan Jadwal</button>
       </form>
     </section>
 
     <section class="card">
-      <h2>Jadwal Feeds</h2>
-      <div class="tableWrap">
+      <h2>Jadwal Post Feeds Instagram</h2>
+      <div class="scrollX">
         <table>
           <thead>
             <tr>
-              <th>#</th>
-              <th>SOP</th>
+              <th>Urutan</th>
+              <th>Warna SOP</th>
               <th>Nama</th>
-              <th>Judul</th>
-              <th>Waktu</th>
-              <th>Aksi</th>
+              <th>Konten</th>
+              <th>Waktu Posting</th>
+              <th>Reschedule/Hapus</th>
             </tr>
           </thead>
           <tbody id="feedsTable"></tbody>
         </table>
       </div>
     </section>
+
   </div>
 </div>
 
-<!-- ================================================= -->
-<!-- ================= STORY SECTION ================= -->
-<!-- ================================================= -->
+<!-- ================= STORY ================= -->
 <div id="storySection" style="display:none;">
-
   <div class="grid">
+
     <section class="card">
-      <h2>Form Story</h2>
+      <h2>Form Schedule/Reschedule Stories</h2>
       <form id="storyForm">
-        <label>Nama</label>
+        <label>Nama Pengisi</label>
         <input id="storyNama" required>
 
-        <label>Judul Story</label>
-        <input id="storyJudul" required>
+        <label>Konten yang ingin diupload</label>
+        <input id="storyKonten" required>
 
-        <label>Waktu Posting</label>
+        <label>Tanggal & Jam Posting</label>
         <input id="storyWaktu" type="datetime-local" required>
 
-        <div class="btns">
-          <button class="primary">Simpan Story</button>
-        </div>
+        <button class="primary">Simpan Jadwal</button>
       </form>
     </section>
 
     <section class="card">
-      <h2>Jadwal Story</h2>
-      <div class="tableWrap">
+      <h2>Jadwal Post Stories Instagram</h2>
+      <div class="scrollX">
         <table>
           <thead>
             <tr>
-              <th>#</th>
+              <th>Urutan</th>
               <th>Nama</th>
-              <th>Judul</th>
-              <th>Waktu</th>
+              <th>Konten</th>
+              <th>Waktu Posting</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody id="storyTable"></tbody>
         </table>
       </div>
     </section>
-  </div>
 
+  </div>
 </div>
 
-<!-- ================================================= -->
-<!-- ================= CALENDAR SECTION ============== -->
-<!-- ================================================= -->
+<!-- ================= CALENDAR ================= -->
 <div id="calendarSection" style="display:none;">
   <section class="card">
-    <h2>Kalender Jadwal Feeds + Story</h2>
+    <h2>Kalender Jadwal Feeds + Stories</h2>
     <div id="calendar"></div>
   </section>
 </div>
 
-<footer>© IG Scheduler — BEM FKM Undip 2026</footer>
+<footer>
+  © Bidang Keorganisasian dan Pengembangan Sumber Daya Manusia — BEM FKM Undip 2026
+</footer>
 
 </div>
 
-<!-- FULLCALENDAR -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
 <script>
-/* ================= TAB SWITCH ================= */
+/* TAB SWITCH */
 function switchTab(tab){
-  document.getElementById("feedsSection").style.display = "none";
-  document.getElementById("storySection").style.display = "none";
-  document.getElementById("calendarSection").style.display = "none";
+  feedsSection.style.display="none";
+  storySection.style.display="none";
+  calendarSection.style.display="none";
 
-  document.querySelectorAll(".tabBtn").forEach(btn=>btn.classList.remove("active"));
+  document.querySelectorAll(".tabBtn").forEach(b=>b.classList.remove("active"));
 
-  if(tab==="feeds"){
-    document.getElementById("feedsSection").style.display="block";
-    document.querySelectorAll(".tabBtn")[0].classList.add("active");
-  }
-  if(tab==="story"){
-    document.getElementById("storySection").style.display="block";
-    document.querySelectorAll(".tabBtn")[1].classList.add("active");
-  }
-  if(tab==="calendar"){
-    document.getElementById("calendarSection").style.display="block";
-    document.querySelectorAll(".tabBtn")[2].classList.add("active");
-    calendar.render();
-  }
+  if(tab==="feeds"){feedsSection.style.display="block";document.querySelectorAll(".tabBtn")[0].classList.add("active");}
+  if(tab==="story"){storySection.style.display="block";document.querySelectorAll(".tabBtn")[1].classList.add("active");}
+  if(tab==="calendar"){calendarSection.style.display="block";document.querySelectorAll(".tabBtn")[2].classList.add("active");calendar.render();}
 }
 
-/* ================= DATA STORAGE ================= */
-let feeds = [];
-let stories = [];
-
 /* SOP COLORS */
-const SOP = ["var(--g1)","var(--g2)","var(--g3)"];
+const SOP=["var(--g1)","var(--g2)","var(--g3)"];
 
-/* ================= FEEDS ================= */
-document.getElementById("feedsForm").addEventListener("submit", e=>{
+/* DATA */
+let feeds=[];
+let stories=[];
+
+/* FEEDS */
+feedsForm.onsubmit=(e)=>{
   e.preventDefault();
   feeds.push({
-    nama: feedsNama.value,
-    judul: feedsJudul.value,
-    waktu: feedsWaktu.value
+    nama:feedsNama.value,
+    konten:feedsKonten.value,
+    waktu:feedsWaktu.value
   });
   renderFeeds();
   renderCalendar();
-});
+};
 
 function renderFeeds(){
   feedsTable.innerHTML="";
   feeds.forEach((f,i)=>{
-    feedsTable.innerHTML += `
+    feedsTable.innerHTML+=`
       <tr>
-        <td>#${i+1}</td>
+        <td><b>#${i+1}</b></td>
         <td><span class="badge" style="background:${SOP[i%3]}">SOP</span></td>
         <td>${f.nama}</td>
-        <td>${f.judul}</td>
-        <td>${f.waktu}</td>
-        <td>-</td>
+        <td>${f.konten}</td>
+        <td>${new Date(f.waktu).toLocaleString()}</td>
+        <td>
+          <button class="mini">Reschedule</button>
+          <button class="mini">Hapus</button>
+        </td>
       </tr>
     `;
   });
 }
 
-/* ================= STORY ================= */
-document.getElementById("storyForm").addEventListener("submit", e=>{
+/* STORY */
+storyForm.onsubmit=(e)=>{
   e.preventDefault();
   stories.push({
-    nama: storyNama.value,
-    judul: storyJudul.value,
-    waktu: storyWaktu.value
+    nama:storyNama.value,
+    konten:storyKonten.value,
+    waktu:storyWaktu.value
   });
   renderStory();
   renderCalendar();
-});
+};
 
 function renderStory(){
   storyTable.innerHTML="";
   stories.forEach((s,i)=>{
-    storyTable.innerHTML += `
+    storyTable.innerHTML+=`
       <tr>
-        <td>#${i+1}</td>
+        <td><b>#${i+1}</b></td>
         <td>${s.nama}</td>
-        <td>${s.judul}</td>
-        <td>${s.waktu}</td>
+        <td>${s.konten}</td>
+        <td>${new Date(s.waktu).toLocaleString()}</td>
+        <td>
+          <button class="mini">Reschedule</button>
+          <button class="mini">Hapus</button>
+        </td>
       </tr>
     `;
   });
 }
 
-/* ================= CALENDAR ================= */
-let calendarEl = document.getElementById("calendar");
-let calendar = new FullCalendar.Calendar(calendarEl,{
+/* CALENDAR */
+let calendar=new FullCalendar.Calendar(calendarEl,{
   initialView:"dayGridMonth",
   height:650,
   events:[]
 });
 
 function renderCalendar(){
-  let events = [];
-
-  feeds.forEach(f=>{
-    events.push({
-      title:"📌 FEEDS: "+f.judul,
-      start:f.waktu
-    });
-  });
-
-  stories.forEach(s=>{
-    events.push({
-      title:"📍 STORY: "+s.judul,
-      start:s.waktu
-    });
-  });
+  let events=[];
+  feeds.forEach(f=>events.push({title:"📌 FEEDS: "+f.konten,start:f.waktu}));
+  stories.forEach(s=>events.push({title:"📍 STORY: "+s.konten,start:s.waktu}));
 
   calendar.removeAllEvents();
   calendar.addEventSource(events);
