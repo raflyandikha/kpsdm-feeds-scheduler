@@ -255,6 +255,8 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
     }
 
     .calendar-header h3 {
@@ -266,6 +268,7 @@
     .calendar-nav {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .calendar-nav button {
@@ -277,11 +280,27 @@
       cursor: pointer;
       font-weight: 600;
       transition: .2s;
+      font-size: 12px;
     }
 
     .calendar-nav button:hover {
       background: var(--yellow);
       color: black;
+    }
+
+    /* CALENDAR SCROLL WRAPPER */
+    .calendar-scroll-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 0 16px 0;
+      margin: 0 -20px -20px -20px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .calendar-inner {
+      min-width: 900px;
+      width: 100%;
     }
 
     .calendar-weekdays {
@@ -297,6 +316,7 @@
       padding: 10px;
       font-size: 12px;
       color: var(--muted);
+      min-width: 120px;
     }
 
     .calendar-days {
@@ -306,12 +326,13 @@
     }
 
     .day {
-      aspect-ratio: 1;
+      min-width: 120px;
+      aspect-ratio: auto;
+      height: 120px;
       border: 1px solid rgba(255,255,255,.1);
       border-radius: 12px;
       padding: 8px;
       background: rgba(0,0,0,.2);
-      min-height: 100px;
       display: flex;
       flex-direction: column;
       cursor: pointer;
@@ -348,7 +369,7 @@
     .day-events {
       flex: 1;
       overflow-y: auto;
-      font-size: 10px;
+      font-size: 9px;
       line-height: 1.2;
     }
 
@@ -507,6 +528,123 @@
       font-size: 14px;
     }
 
+    /* RESPONSIVE MOBILE */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 28px;
+      }
+
+      .calendar-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .calendar-header h3 {
+        font-size: 18px;
+      }
+
+      .calendar-nav {
+        width: 100%;
+      }
+
+      .calendar-nav button {
+        flex: 1;
+        min-width: 0;
+        font-size: 11px;
+        padding: 6px 10px;
+      }
+
+      .weekday {
+        font-size: 10px;
+        padding: 8px 4px;
+        min-width: 100px;
+      }
+
+      .day {
+        min-width: 100px;
+        height: 100px;
+        padding: 6px;
+      }
+
+      .day-number {
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+
+      .day-events {
+        font-size: 8px;
+      }
+
+      .event-item {
+        padding: 2px 4px;
+        margin-bottom: 1px;
+      }
+
+      .modal-content {
+        padding: 20px;
+        max-width: 95%;
+      }
+
+      .modal-header h2 {
+        font-size: 16px;
+      }
+
+      .modal-event-detail {
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .wrap {
+        padding: 20px 12px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .calendar-nav button {
+        font-size: 10px;
+        padding: 5px 8px;
+      }
+
+      .weekday {
+        font-size: 9px;
+        padding: 6px 2px;
+        min-width: 85px;
+      }
+
+      .day {
+        min-width: 85px;
+        height: 85px;
+        padding: 4px;
+      }
+
+      .day-number {
+        font-size: 11px;
+        margin-bottom: 2px;
+      }
+
+      .day-events {
+        font-size: 7px;
+      }
+
+      .event-item {
+        padding: 2px 3px;
+        font-size: 6.5px;
+      }
+
+      .calendar-legend {
+        gap: 10px;
+        font-size: 11px;
+      }
+
+      .legend-color {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
     footer{
       text-align:center;
       margin-top:30px;
@@ -638,17 +776,21 @@
         </div>
       </div>
 
-      <div class="calendar-weekdays">
-        <div class="weekday">Minggu</div>
-        <div class="weekday">Senin</div>
-        <div class="weekday">Selasa</div>
-        <div class="weekday">Rabu</div>
-        <div class="weekday">Kamis</div>
-        <div class="weekday">Jumat</div>
-        <div class="weekday">Sabtu</div>
-      </div>
+      <div class="calendar-scroll-wrapper">
+        <div class="calendar-inner">
+          <div class="calendar-weekdays">
+            <div class="weekday">Minggu</div>
+            <div class="weekday">Senin</div>
+            <div class="weekday">Selasa</div>
+            <div class="weekday">Rabu</div>
+            <div class="weekday">Kamis</div>
+            <div class="weekday">Jumat</div>
+            <div class="weekday">Sabtu</div>
+          </div>
 
-      <div class="calendar-days" id="calendarDays"></div>
+          <div class="calendar-days" id="calendarDays"></div>
+        </div>
+      </div>
 
       <div class="calendar-legend">
         <div class="legend-item">
