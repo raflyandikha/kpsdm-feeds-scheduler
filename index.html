@@ -329,6 +329,10 @@
       cursor: not-allowed;
     }
 
+    .day.other-month:hover {
+      background: rgba(0,0,0,.2);
+    }
+
     .day.today {
       background: rgba(255,204,0,.15);
       border-color: var(--yellow);
@@ -345,7 +349,7 @@
       flex: 1;
       overflow-y: auto;
       font-size: 10px;
-      line-height: 1.3;
+      line-height: 1.2;
     }
 
     .event-item {
@@ -396,6 +400,111 @@
 
     .legend-color.story {
       background: var(--story-color);
+    }
+
+    /* MODAL STYLE */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,.7);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.show {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, rgba(20,20,30,.95), rgba(40,20,50,.95));
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 80px rgba(0,0,0,.55);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      color: var(--yellow);
+    }
+
+    .modal-event {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .modal-event-type {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .modal-event-type.feed {
+      background: rgba(255, 107, 157, 0.9);
+      color: white;
+    }
+
+    .modal-event-type.story {
+      background: rgba(0, 217, 255, 0.9);
+      color: black;
+    }
+
+    .modal-event-detail {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .modal-event-detail strong {
+      color: var(--yellow);
+    }
+
+    .modal-empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 20px;
+      font-size: 14px;
     }
 
     footer{
@@ -555,6 +664,17 @@
   </section>
 </div>
 
+<!-- MODAL UNTUK DETAIL JADWAL -->
+<div id="eventModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalDateTitle">Jadwal Tanggal</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modalEventsList"></div>
+  </div>
+</div>
+
 <footer>
   © Bidang Keorganisasian dan Pengembangan Sumber Daya Manusia — BEM FKM Undip 2026
 </footer>
@@ -610,6 +730,71 @@
     return date.toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' });
   }
 
+  function fmtDateFull(iso) {
+    const date = new Date(iso);
+    const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  }
+
+  /* MODAL FUNCTIONS */
+  window.closeModal = () => {
+    document.getElementById("eventModal").classList.remove("show");
+  };
+
+  window.openModal = (day, month, year) => {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    // Get events for this date
+    const dayFeeds = feeds.filter(f => f.waktu.split('T')[0] === dateStr);
+    const dayStories = stories.filter(s => s.waktu.split('T')[0] === dateStr);
+    
+    // Set modal title
+    const dateObj = new Date(year, month, day);
+    const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const dateTitle = `${days[dateObj.getDay()]}, ${day} ${months[month]} ${year}`;
+    document.getElementById("modalDateTitle").textContent = dateTitle;
+    
+    // Build events list
+    let html = "";
+    
+    if (dayFeeds.length === 0 && dayStories.length === 0) {
+      html = '<div class="modal-empty">Tidak ada jadwal untuk tanggal ini</div>';
+    } else {
+      // Add feeds
+      dayFeeds.forEach(feed => {
+        html += `
+          <div class="modal-event">
+            <div class="modal-event-type feed">📌 FEEDS</div>
+            <div class="modal-event-detail">
+              <strong>Konten:</strong> ${feed.judul}<br>
+              <strong>Nama Pengisi:</strong> ${feed.nama}<br>
+              <strong>Jam Posting:</strong> ${fmtTime(feed.waktu)}
+            </div>
+          </div>
+        `;
+      });
+      
+      // Add stories
+      dayStories.forEach(story => {
+        html += `
+          <div class="modal-event">
+            <div class="modal-event-type story">⚡ STORIES</div>
+            <div class="modal-event-detail">
+              <strong>Konten:</strong> ${story.judul}<br>
+              <strong>Nama Pengisi:</strong> ${story.nama}<br>
+              <strong>Jam Posting:</strong> ${fmtTime(story.waktu)}
+            </div>
+          </div>
+        `;
+      });
+    }
+    
+    document.getElementById("modalEventsList").innerHTML = html;
+    document.getElementById("eventModal").classList.add("show");
+  };
+
   /* KALENDER CUSTOM */
   window.prevMonth = () => {
     currentDate.setMonth(currentDate.getMonth() - 1);
@@ -648,7 +833,6 @@
       const day = daysInPrevMonth - i;
       const prevYear = month === 0 ? year - 1 : year;
       const prevMonth = month === 0 ? 11 : month - 1;
-      const dateStr = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       
       const dayEl = document.createElement("div");
       dayEl.className = "day other-month";
@@ -674,31 +858,33 @@
       const eventsDiv = document.createElement("div");
       eventsDiv.className = "day-events";
 
-      // Add feeds for this day
+      // Add feeds for this day (show KONTEN, not nama pengisi)
       feeds.forEach(feed => {
         const feedDate = feed.waktu.split('T')[0];
         if (feedDate === dateStr) {
           const eventEl = document.createElement("div");
           eventEl.className = "event-item feed";
-          eventEl.textContent = `📌 ${feed.nama}`;
-          eventEl.title = `${feed.judul} - ${fmtTime(feed.waktu)}`;
+          eventEl.textContent = `📌 ${feed.judul}`;
           eventsDiv.appendChild(eventEl);
         }
       });
 
-      // Add stories for this day
+      // Add stories for this day (show KONTEN, not nama pengisi)
       stories.forEach(story => {
         const storyDate = story.waktu.split('T')[0];
         if (storyDate === dateStr) {
           const eventEl = document.createElement("div");
           eventEl.className = "event-item story";
-          eventEl.textContent = `⚡ ${story.nama}`;
-          eventEl.title = `${story.judul} - ${fmtTime(story.waktu)}`;
+          eventEl.textContent = `⚡ ${story.judul}`;
           eventsDiv.appendChild(eventEl);
         }
       });
 
       dayEl.appendChild(eventsDiv);
+      
+      // Add click event to show details
+      dayEl.onclick = () => openModal(day, month, year);
+      
       calendarDays.appendChild(dayEl);
     }
 
@@ -708,7 +894,6 @@
     for (let day = 1; day <= remainingCells; day++) {
       const nextMonth = month === 11 ? 0 : month + 1;
       const nextYear = month === 11 ? year + 1 : year;
-      const dateStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       
       const dayEl = document.createElement("div");
       dayEl.className = "day other-month";
@@ -725,7 +910,7 @@
     document.getElementById(tabId).classList.add("active");
     ev.target.classList.add("active");
 
-    /* 🔥 FIX: Render calendar when tab becomes visible */
+    /* Render calendar when tab becomes visible */
     if(tabId==="calendarTab"){
       setTimeout(()=>{
         renderCalendar();
@@ -856,6 +1041,14 @@
 
   /* INIT CALENDAR ON LOAD */
   renderCalendar();
+
+  // Close modal ketika klik di luar modal
+  window.onclick = (event) => {
+    const modal = document.getElementById("eventModal");
+    if (event.target === modal) {
+      modal.classList.remove("show");
+    }
+  };
 
 </script>
 
